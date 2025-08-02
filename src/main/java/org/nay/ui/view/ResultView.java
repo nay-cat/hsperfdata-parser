@@ -220,7 +220,6 @@ public class ResultView extends JPanel {
 
         for (Map.Entry<String, List<Map.Entry<String, Object>>> category : categorizedData.entrySet()) {
             copydata.append(category.getKey()).append(":\n");
-            copydata.append("-".repeat(category.getKey().length() + 1)).append("\n");
 
             category.getValue().sort(Map.Entry.comparingByKey());
 
