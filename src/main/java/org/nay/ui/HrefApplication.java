@@ -23,6 +23,7 @@ public class HrefApplication extends JFrame {
     private String currentPath = null;
     private JPanel viewer = null;
     private JScrollPane scrollPane = null;
+    private JPanel mainPanel;
 
     public HrefApplication() {
         setTitle("HsPerfParser");
@@ -35,7 +36,7 @@ public class HrefApplication extends JFrame {
     }
 
     public void initializeComponents() {
-        JPanel mainPanel = new JPanel(new FlowLayout());
+        mainPanel = new JPanel(new FlowLayout());
         JComboBox<String> jComboBox = new JComboBox<>(),
                 selectedView = new JComboBox<>();
 
@@ -138,7 +139,6 @@ public class HrefApplication extends JFrame {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
 
-        // Remove old viewer and scroll pane
         if (scrollPane != null) {
             this.remove(scrollPane);
         }
@@ -154,10 +154,15 @@ public class HrefApplication extends JFrame {
                 break;
         }
 
-        // Wrap in scroll pane
         scrollPane = new JScrollPane(viewer);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // smoother scroll
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setBorder(null);
+
+        mainPanel.addMouseWheelListener(e -> {
+            if (scrollPane != null) {
+                scrollPane.dispatchEvent(SwingUtilities.convertMouseEvent(mainPanel, e, scrollPane));
+            }
+        });
 
         this.add(scrollPane, BorderLayout.CENTER);
         this.revalidate();
