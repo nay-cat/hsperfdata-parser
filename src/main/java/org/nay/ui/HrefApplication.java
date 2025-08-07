@@ -22,8 +22,9 @@ public class HrefApplication extends JFrame {
     private int viewSelection;
     private String currentPath = null;
     private JPanel viewer = null;
+    private JScrollPane scrollPane = null;
 
-    public HrefApplication(){
+    public HrefApplication() {
         setTitle("HsPerfParser");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
@@ -33,7 +34,7 @@ public class HrefApplication extends JFrame {
         setVisible(true);
     }
 
-    public void initializeComponents(){
+    public void initializeComponents() {
         JPanel mainPanel = new JPanel(new FlowLayout());
         JComboBox<String> jComboBox = new JComboBox<>(),
                 selectedView = new JComboBox<>();
@@ -52,9 +53,9 @@ public class HrefApplication extends JFrame {
         this.add(mainPanel, BorderLayout.WEST);
 
         selectedView.addActionListener(e -> {
-             viewSelection = selectedView.getSelectedIndex();
-            System.out.println("debug view: "+selectedView.getSelectedIndex());
-            if (currentPath != null){
+            viewSelection = selectedView.getSelectedIndex();
+            System.out.println("debug view: " + selectedView.getSelectedIndex());
+            if (currentPath != null) {
                 parseAndView(currentPath);
             }
         });
@@ -75,7 +76,7 @@ public class HrefApplication extends JFrame {
 
                     currentPath = selectedFile.getAbsolutePath();
 
-                    System.out.println("debug: "+selectedFile.getAbsolutePath());
+                    System.out.println("debug: " + selectedFile.getAbsolutePath());
 
                     this.setTitle(originalTitle);
 
@@ -123,9 +124,7 @@ public class HrefApplication extends JFrame {
     }
 
     private void parseAndView(String path){
-
         HsPerfDataParser parser = new HsPerfDataParser();
-
         Map<String, Object> data = parser.parseHsPerfDataFromFile(String.valueOf(path));
 
         if (data == null) {
@@ -139,8 +138,9 @@ public class HrefApplication extends JFrame {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
 
-        if (viewer != null){
-            this.remove(viewer);
+        // Remove old viewer and scroll pane
+        if (scrollPane != null) {
+            this.remove(scrollPane);
         }
 
         switch (viewSelection) {
@@ -149,14 +149,18 @@ public class HrefApplication extends JFrame {
                 ((ResultView) viewer).updateData(data);
                 break;
             case 1:
-                this.remove(viewer);
                 viewer = new SimpleView(data);
                 ((SimpleView) viewer).updateData(data);
                 break;
         }
-        this.add(viewer, BorderLayout.CENTER);
+
+        // Wrap in scroll pane
+        scrollPane = new JScrollPane(viewer);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // smoother scroll
+        scrollPane.setBorder(null);
+
+        this.add(scrollPane, BorderLayout.CENTER);
         this.revalidate();
         this.repaint();
     }
-
 }
